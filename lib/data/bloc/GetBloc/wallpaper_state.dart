@@ -1,4 +1,5 @@
-import 'package:wallpaper/model/wallPaper_model.dart';
+
+import '../../../model/wallPaper_model.dart';
 
 abstract class WallPaperState {}
 class WallInitialState extends WallPaperState{}

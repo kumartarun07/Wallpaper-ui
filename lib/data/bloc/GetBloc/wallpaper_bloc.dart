@@ -1,8 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wallpaper/data/bloc/GetBloc/wallpaper_event.dart';
-import 'package:wallpaper/data/bloc/GetBloc/wallpaper_state.dart';
-import 'package:wallpaper/model/wallPaper_model.dart';
-import 'package:wallpaper/repository/wallpaper_repository.dart';
+import 'package:wallpaper_app/data/bloc/GetBloc/wallpaper_event.dart';
+import 'package:wallpaper_app/data/bloc/GetBloc/wallpaper_state.dart';
+
+import '../../../model/wallPaper_model.dart';
+import '../../../repository/wallpaper_repository.dart';
 
 class WallPaperBloc extends Bloc<WallPaperEvent,WallPaperState>
 {

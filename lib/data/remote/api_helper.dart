@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:http/http.dart'as httpApi;
-import 'package:wallpaper/data/remote/app_exception.dart';
-
+import 'app_exception.dart';
 class ApiHelper
 {
   Future<dynamic> getApi({required String url})
@@ -21,15 +19,13 @@ class ApiHelper
       }
   }
 }
-
            dynamic returnJsonRes(httpApi.Response response)
            {
              switch(response.statusCode){
                case 200:{
                  var mData = jsonDecode(response.body);
                  return mData;}
-               case 400:
-                 throw BadRequestException(errorMsg: "${response.body.toString()}");
+               case 400:throw BadRequestException(errorMsg: "${response.body.toString()}");
                case 401:
                case 403:
                  throw UnAuthorisedException(errorMsg: "${response.body.toString()}");

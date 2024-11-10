@@ -29,3 +29,25 @@ TextStyle mTextStyle35({Color mColor =Colors.black,mFontWeight=FontWeight.normal
 {
   return TextStyle(fontFamily: 'main font',fontWeight: mFontWeight,color: mColor,fontSize: 35);
 }
+
+
+Column mColumn({required IconData? mIcon,required String? title,
+  required VoidCallback? onTap,Color? bgColor})
+{
+  return Column(mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      InkWell(
+        onTap: onTap,
+        child: Container(
+          height: 70,width: 70,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),
+              color: bgColor != null ? Colors.blueAccent : Colors.white.withOpacity(0.4)
+          ),
+          child:Center(child: Icon(mIcon,color: Colors.white,size: 28,),),
+        ),
+      ),
+      SizedBox(height: 2,),
+      Text(title.toString(),style: mTextStyle12(mColor: Colors.white,),)
+    ],
+  );
+}

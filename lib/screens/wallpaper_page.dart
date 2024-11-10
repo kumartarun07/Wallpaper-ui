@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wallpaper/app_containst.dart';
-import 'package:wallpaper/data/bloc/GetBloc/wallpaper_bloc.dart';
-import 'package:wallpaper/data/bloc/GetBloc/wallpaper_event.dart';
-import 'package:wallpaper/data/bloc/GetBloc/wallpaper_state.dart';
-import 'package:wallpaper/data/bloc/searchBloc/search_bloc.dart';
-import 'package:wallpaper/data/remote/api_helper.dart';
-import 'package:wallpaper/repository/wallpaper_repository.dart';
-import 'package:wallpaper/screens/search_wall_page.dart';
-import 'package:wallpaper/utills/utills_helper.dart';
+import 'package:lottie/lottie.dart';
+import 'package:wallpaper_app/screens/search_wall_page.dart';
+import '../app_containst.dart';
+import '../data/bloc/GetBloc/wallpaper_bloc.dart';
+import '../data/bloc/GetBloc/wallpaper_event.dart';
+import '../data/bloc/GetBloc/wallpaper_state.dart';
+import '../data/bloc/searchBloc/search_bloc.dart';
+import '../data/remote/api_helper.dart';
+import '../repository/wallpaper_repository.dart';
+import '../utills/utills_helper.dart';
+import 'detail_page.dart';
 
 class WallpaperPage extends StatefulWidget
 {  @override
@@ -31,13 +33,13 @@ class _WallpaperPageState extends State<WallpaperPage>
         if(state is WallLoadingState){
           return Center(child: CircularProgressIndicator(),);
         }else if(state is WallErrorState){
-          return Center(child: Text(state.errorMsg),);
+          return Center(child: Lottie.asset("assets/lottie/network.json"),);
         }else if(state is WallLoadedState){
           var mdata = state.Photos;
           return ListView(
             shrinkWrap: true,
             children: [
-              Container(height: 50,),
+              Container(height: 40,),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 8),
                 child: TextField(controller: wallController,
@@ -48,6 +50,8 @@ class _WallpaperPageState extends State<WallpaperPage>
                         if(wallController.text.isNotEmpty){
                           Navigator.push(context, MaterialPageRoute(builder: (context)=>BlocProvider(create: (context)=>
                               SearchBloc(wallPaperRepository: WallPaperRepository(apiHelper: ApiHelper())),child: SearchWallPage(query: wallController.text))));
+                        }else{
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: Please fill blank field")));
                         }
                     }, icon: Icon(Icons.search,size: 30,color: Colors.grey.shade400,)),
                     hintStyle: mTextStyle12(mColor: Colors.grey.shade400,),
@@ -75,12 +79,18 @@ class _WallpaperPageState extends State<WallpaperPage>
                     scrollDirection:Axis.horizontal,
                     itemBuilder: (_,index)
                     {
-                      return Container(height:200,width:150,
-                          margin: EdgeInsets.only(left: 16,right: index==Portrait.wall.length-1?16:0),
-                          decoration: BoxDecoration(image:DecorationImage(
-                              image: NetworkImage(mdata[index].src!.portrait.toString()),fit: BoxFit.cover),
-                            borderRadius: BorderRadius.circular(20),
-                          )
+                      var eachPhoto = state.Photos[index];
+                      return InkWell(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(srcModel: eachPhoto.src!)));
+                        },
+                        child: Container(height:200,width:150,
+                            margin: EdgeInsets.only(left: 16,right: index==Portrait.wall.length-1?16:0),
+                            decoration: BoxDecoration(image:DecorationImage(
+                                image: NetworkImage(eachPhoto.src!.portrait.toString()),fit: BoxFit.cover),
+                              borderRadius: BorderRadius.circular(20),
+                            )
+                        ),
                       );
                     }
                 ),
@@ -92,14 +102,24 @@ class _WallpaperPageState extends State<WallpaperPage>
               ),
               SizedBox(height: 7,),
               Container(height: 50,width:double.infinity,
-                  child:    ListView.builder(itemCount: ColorPage.kamal.length,
+                  child:ListView.builder(itemCount: ColorPage.kamal.length,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (_,index)
                       {
-                        return Container(height: 50,width: 50,
-                          margin: EdgeInsets.only(left: 16,right: index==ColorPage.kamal.length-1?16:0),
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(11),
-                            color:ColorPage.kamal[index]['WallPaper'],),
+                        return InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                            BlocProvider(create: (context)=>SearchBloc(wallPaperRepository: WallPaperRepository(apiHelper: ApiHelper())),
+                              child: SearchWallPage(
+                                query:wallController.text.isNotEmpty ? wallController.text:"Nature",
+                                color: ColorPage.kamal[index]['Code']))
+                            ));
+                          },
+                          child: Container(height: 50,width: 50,
+                            margin: EdgeInsets.only(left: 16,right: index==ColorPage.kamal.length-1?16:0),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(11),
+                              color:ColorPage.kamal[index]['WallPaper'],),
+                          ),
                         );
                       })
               ),
@@ -122,12 +142,21 @@ class _WallpaperPageState extends State<WallpaperPage>
                   ),
                   itemCount: LandScape.pic.length,
                   itemBuilder: (_,index){
-                    return Container(height: 100,width: 200,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(11),
-                          image: DecorationImage(image: AssetImage(LandScape.pic[index]["WallPaper"]),fit:BoxFit.cover)
-                      ),
-                      child: Center(
-                        child:Text(LandScape.pic[index]['title'],style: mTextStyle16(mColor: Colors.white,mFontWeight: FontWeight.bold),),
+                    return InkWell(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                        BlocProvider(create: (context)=>SearchBloc(wallPaperRepository: WallPaperRepository
+                          (apiHelper: ApiHelper())),
+                          child: SearchWallPage(query: LandScape.pic[index]['title']),)
+                        ));
+                      },
+                      child: Container(height: 100,width: 200,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(11),
+                            image: DecorationImage(image: AssetImage(LandScape.pic[index]["WallPaper"]),fit:BoxFit.cover)
+                        ),
+                        child: Center(
+                          child:Text(LandScape.pic[index]['title'],style: mTextStyle16(mColor: Colors.white,mFontWeight: FontWeight.bold),),
+                        ),
                       ),
                     );
                   },
